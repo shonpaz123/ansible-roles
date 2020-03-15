@@ -1,8 +1,0 @@
-galaxy_info:
-  author: Shon Paz
-  description: This role is responsible for migrating OS distributions without data movement 
-  company: Red Hat
-
-  min_ansible_version: 2.6.5 
-
-
