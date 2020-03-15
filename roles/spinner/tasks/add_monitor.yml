@@ -34,7 +34,7 @@
 
 - name: update ceph.conf | populate fact monip
   set_fact: 
-    monip: "{{ monip }}{{ hostvars[item]['ansible_bond0.200'].ipv4.address }},"
+    monip: "{{ monip }}{{ hostvars[item]['ansible_eth1'].ipv4.address }},"
   with_items:
     - "{{ groups['mons'] }}"
   changed_when: 1 == 2
@@ -48,7 +48,7 @@
 
 - name: copy ceph.conf to new mon node {{ mighost }}
   copy:
-    src: "../roles/spinner/files/ceph.conf"
+    src: "roles/spinner/files/ceph.conf"
     dest: "/etc/ceph/"
     owner: ceph
     group: ceph
@@ -69,13 +69,13 @@
 - name: fetch keyring from mon cluster memeber node
   fetch:
     src: "/etc/ceph/{{ clustername }}.client.admin.keyring"
-    dest: "../roles/spinner/files/"
+    dest: "roles/spinner/files/"
     flat: yes
   when: ansible_hostname != mighost
 
 - name: copy keyring to new mon node {{ mighost }}
   copy:
-    src: "../roles/spinner/files/{{ clustername }}.client.admin.keyring"
+    src: "roles/spinner/files/{{ clustername }}.client.admin.keyring"
     dest: "/etc/ceph/"
     owner: ceph
     group: ceph
@@ -103,7 +103,7 @@
   when: mighost == ansible_hostname
   with_items:
     - "/var/log/ceph"
-    - "/var/rub/ceph"
+    - "/var/run/ceph"
     - "/etc/ceph"
     - "/var/lib/ceph/mon"
 

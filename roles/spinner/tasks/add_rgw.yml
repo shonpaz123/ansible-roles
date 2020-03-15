@@ -5,7 +5,7 @@
     state: present
   with_items:
     - ceph-common
-    - radosgw
+    - ceph-radosgw
   when: ansible_hostname == mighost
 
 - name: check path exists for ceph.conf
@@ -18,7 +18,7 @@
 
 - name: copy ceph.conf to {{ mighost }}
   copy:
-    src: "../roles/spinner/files/ceph.conf"
+    src: "roles/spinner/files/ceph.conf"
     dest: "/etc/ceph/ceph.conf"
     owner: ceph
     group: ceph
@@ -34,7 +34,7 @@
 
 - name: copy radosgw keyring to {{ mighost }}
   copy:
-    src: "../roles/spinner/files/keyring"
+    src: "roles/spinner/files/keyring"
     dest: "/var/lib/ceph/radosgw/ceph-rgw.{{ mighost }}/keyring"
     owner: ceph
     group: ceph
@@ -56,8 +56,11 @@
 - name: start radosgw service on {{ mighost }}
   service:
     name: "ceph-radosgw@rgw.{{ mighost }}"
-    state: stopped
+    state: started
   when: mighost == ansible_hostname 
 
+- name: start radosgw service on {{ mighost }}
+  service:
+    name: "ceph-radosgw@rgw.{{ mighost }}"
     enabled: yes
   when: ansible_hostname == mighost 

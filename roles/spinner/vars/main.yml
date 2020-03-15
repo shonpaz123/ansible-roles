@@ -1,6 +1,6 @@
 ---
 # vars file for spinner
-mighost: mon0
-clustername: ceph
-carousel_action: removal
+mighost: # migrated host name 
+clustername: ceph # cluster, default is ceph
+carousel_action: # removal/addition 
 
