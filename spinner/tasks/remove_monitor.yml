@@ -1,0 +1,56 @@
+---
+- name: copy ceph.conf to backup folder 
+  fetch: 
+    src: /etc/ceph/ceph.conf 
+    dest: ../roles/spinner/files/ceph.conf 
+    flat: yes
+
+- name: copy admin keyring to backup folder
+  fetch:
+    src: /etc/ceph/ceph.client.admin.keyring 
+    dest: ../roles/spinner/files/ceph.client.admin.keyring
+    flat: yes 
+
+- name: stop ceph-mon process 
+  service:
+    name: "ceph-mon@{{ mighost }}"
+    state: stopped
+    enabled: yes 
+  when: mighost == "{{ ansible_hostname }}"
+      
+- name: remove mon daemon
+  shell: "ceph mon remove {{ mighost }}"
+  when: mighost == "{{ ansible_hostname }}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

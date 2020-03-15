@@ -1,0 +1,34 @@
+---
+- name: freeze osds in cluster
+  shell:  "{{ item }}"
+  with_items:
+    - "ceph osd set noout"
+    - "ceph osd set norecover"
+    - "ceph osd set norebalance"
+    - "ceph osd set noscrub"
+    - "ceph osd set nodeep-scrub"
+    - "ceph osd set nobackfill"
+  when: inventory_hostname in groups['mons']
+  run_once: yes
+
+- name: backup osd mountpoints 
+  shell: "df -h | awk '{print $6}' | grep ceph"
+  register: mountpoints 
+
+- name: create mountpoints file 
+  copy: 
+    content: "{{ mountpoints.stdout }}"
+    dest: "../roles/spinner/files/mountpoints"
+  delegate_to: localhost
+ 
+- name: collect osd ids 
+  shell: "ceph osd ls-tree {{ mighost }}"
+  register: osdids
+
+- name: stop osds on "{{ mighost }}"
+  service:
+    name: ceph-osd@{{ item }}
+    state: stopped
+  with_items:
+  - "{{ osdids.stdout_lines}}"
+  when: mighost == ansible_hostname

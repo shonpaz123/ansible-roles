@@ -1,0 +1,6 @@
+---
+# vars file for spinner
+mighost: localhost
+clustername: ceph
+carousel_action: "addition"
+
