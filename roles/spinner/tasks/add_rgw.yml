@@ -1,0 +1,63 @@
+---
+- name: install ceph-common and radosgw on {{ mighost }}
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ceph-common
+    - radosgw
+  when: ansible_hostname == mighost
+
+- name: check path exists for ceph.conf
+  file:
+    path: "/etc/ceph"
+    owner: ceph
+    group: ceph
+    state: directory
+  when: ansible_hostname == mighost
+
+- name: copy ceph.conf to {{ mighost }}
+  copy:
+    src: "../roles/spinner/files/ceph.conf"
+    dest: "/etc/ceph/ceph.conf"
+    owner: ceph
+    group: ceph
+  when: ansible_hostname == mighost
+
+- name: check path exists for keyring
+  file:
+    path: "/var/lib/ceph/radosgw/ceph-rgw.{{ mighost }}"
+    owner: ceph
+    group: ceph
+    state: directory
+  when: ansible_hostname == mighost
+
+- name: copy radosgw keyring to {{ mighost }}
+  copy:
+    src: "../roles/spinner/files/keyring"
+    dest: "/var/lib/ceph/radosgw/ceph-rgw.{{ mighost }}/keyring"
+    owner: ceph
+    group: ceph
+  when: ansible_hostname == mighost
+
+- name: check service dir exists
+  file:
+    path: "/etc/systemd/system/ceph-radosgw.target.wants/"
+    state: directory
+  when: ansible_hostname == mighost 
+
+- name: check softlink for service exists
+  file:
+    src: "/lib/systemd/system/ceph-radosgw@.service"
+    dest: "/etc/systemd/system/ceph-radosgw.target.wants/ceph-radosgw@rgw.{{ mighost }}.service"
+    state: link
+  when: ansible_hostname == mighost 
+
+- name: start radosgw service on {{ mighost }}
+  service:
+    name: "ceph-radosgw@rgw.{{ mighost }}"
+    state: stopped
+  when: mighost == ansible_hostname 
+
+    enabled: yes
+  when: ansible_hostname == mighost 
